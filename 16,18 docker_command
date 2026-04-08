@@ -1,0 +1,4 @@
+docker build -t java-app .
+docker run java-app
+docker tag java-app yourusername/java-app:v1
+docker push yourusername/java-app:v1
