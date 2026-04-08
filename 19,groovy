@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Clone Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/mohanrmoni54-collab/maveninjenkins.git'
+            }
+        }
+
+        stage('Build Java App') {
+            steps {
+                dir('JUnitDemo') {
+                    bat 'mvn clean package'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t my-app JUnitDemo'
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                bat 'docker run -d my-app'
+            }
+        }
+    }
+}
