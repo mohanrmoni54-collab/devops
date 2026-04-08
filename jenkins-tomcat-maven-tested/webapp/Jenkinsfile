@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'mymaven'
+        jdk 'myjdk'
+    }
+
+    environment {
+        IMAGE_NAME = "webapp-image"
+        CONTAINER_NAME = "webapp-container"
+    }
+
+    stages {
+
+        stage('Clone') {
+            steps {
+                git 'https://github.com/YOUR_USERNAME/YOUR_REPO.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat 'mvn clean package'
+            }
+        }
+
+        stage('Docker Build') {
+    steps {
+        bat 'docker build -t webapp-image .'
+    }
+}
+
+        stage('Stop Old Container') {
+    steps {
+        bat 'docker stop webapp-container || exit 0'
+        bat 'docker rm webapp-container || exit 0'
+    }
+}
+
+        stage('Run Container') {
+            steps {
+                bat 'docker run -d -p 8087:8080 --name webapp-container webapp-image'
+            }
+        }
+    }
+}
