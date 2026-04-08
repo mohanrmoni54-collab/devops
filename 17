@@ -1,0 +1,16 @@
+docker run nginx
+docker run -d nginx
+docker run -d -p 8082:80 nginx
+docker volume create myvolume
+docker volume create myvolume2
+docker volume ls
+docker run -it -v myvolume:/data ubuntu bash
+cd /data
+echo "docker volume" > test.txt
+exit
+docker run -it -v myvolume:/data ubuntu bash
+cat /data/test.txt
+docker run -it -v myvolume:/data ubuntu bash
+echo "<h1> Persistent Data Working</h1>" > /data/index.html
+exit
+docker run -d -p 8083:80 -v myvolume:/usr/share/nginx/html nginx
