@@ -1,3 +1,6 @@
+mvn archetype:generate -DgroupId=com.example -DartifactId=webapp -DarchetypeArtifactId=maven-archetype-webapp -DinteractiveMode=false
+
+
 docker build -t webapp-image .
 docker run -d -p 8087:8080 --name webapp-container webapp-image
 http://localhost:8087/webapp
