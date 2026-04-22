@@ -4,3 +4,88 @@ mvn archetype:generate -DarchetypeArtifactId=maven-archetype-webapp -DarchetypeC
 docker build -t webapp-image .
 docker run -d -p 8087:8080 --name webapp-container webapp-image
 http://localhost:8087/webapp
+
+
+pom.xml
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.mohan.devops</groupId>
+  <artifactId>student-app</artifactId>
+  <version>1.0</version>
+  <packaging>war</packaging>
+
+  <name>student-app</name>
+
+  <dependencies>
+    <!-- Servlet API -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>4.0.1</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>student-app</finalName>
+  </build>
+</project>
+
+Dockerfile
+FROM tomcat:9.0-jdk17
+
+COPY target/student-app.war /usr/local/tomcat/webapps/
+
+EXPOSE 8080
+
+
+
+Jenkinsfile
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "student-app-image"
+        CONTAINER_NAME = "student-app-container"
+    }
+
+    tools {
+        maven 'maven3'
+    }
+
+    stages {
+
+        stage('Clone Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/your-repo/student-app.git'
+            }
+        }
+
+        stage('Build WAR') {
+            steps {
+                bat 'mvn clean package'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t %IMAGE_NAME% .'
+            }
+        }
+
+        stage('Stop Old Container') {
+            steps {
+                bat 'docker rm -f %CONTAINER_NAME% || exit 0'
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                bat 'docker run -d -p 8087:8080 --name %CONTAINER_NAME% %IMAGE_NAME%'
+            }
+        }
+    }
+}
+
+
