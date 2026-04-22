@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+    
+    environment {
+        IMAGE_NAME = "my-app"
+        CONTAINER_NAME = "my-app-container"
+    }
+    
+    tools {
+        maven 'maven3'  
+    }
+
+    stages {
+
+        stage('Clone Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/mohanrmoni54-collab/jenkkins_tomcat.git'
+            }
+        }
+
+        stage('Build WAR') {
+            steps {
+                dir('jenkins-tomcat-maven-tested/webapp') {   
+                    bat 'mvn clean package'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('jenkins-tomcat-maven-tested/webapp') {   
+                    bat 'docker build -t %IMAGE_NAME% .'
+                }
+            }
+        }
+
+        stage('Stop Old Container') {
+            steps {
+                bat 'docker stop %CONTAINER_NAME% || exit 0'
+                bat 'docker rm %CONTAINER_NAME% || exit 0'
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                bat 'docker run -d -p 8087:8080 --name %CONTAINER_NAME% %IMAGE_NAME%'
+            }
+        }
+    }
+}
