@@ -1,3 +1,17 @@
+15
+docker ps
+docker ps -a
+docker images
+docker run hello-world
+docker pull nginx
+docker run -d -p 8080:80 nginx
+http://localhost:8080
+
+
+
+
+
+
 docker build -t java-app .
 docker run java-app
 docker tag java-app yourusername/java-app:v1
